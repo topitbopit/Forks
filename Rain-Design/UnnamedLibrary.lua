@@ -7,6 +7,7 @@
 -- * Localized easing variables
 -- * Added library.Toggles, a table containing every toggle 
 -- * Added toggle.State, self explanatory
+-- * Added section:Label
 
 local library = {
     Flags = {},
@@ -198,160 +199,160 @@ uIPadding.PaddingRight = UDim.new(0, 5)
 uIPadding.Parent = notificationHolder
 
 function library:Notification(Info)
-Info.Title = Info.Title or "Notification"
-Info.Description = Info.Description or "Placeholder"
-Info.Timeout = Info.Timeout or nil
-Info.Callback = Info.Callback or BlankFn
+    Info.Title = Info.Title or "Notification"
+    Info.Description = Info.Description or "Placeholder"
+    Info.Timeout = Info.Timeout or nil
+    Info.Callback = Info.Callback or BlankFn
 
-local Theme = Themes[library.Theme]
+    local Theme = Themes[library.Theme]
 
-if Theme == nil then
-    error("There's no theme called: "..library.Theme, 0)
-end
+    if Theme == nil then
+        error("There's no theme called: "..library.Theme, 0)
+    end
 
-local notificationMain = Instance.new("Frame")
-notificationMain.Name = "NotificationMain"
-notificationMain.BackgroundColor3 = Theme.Main
-notificationMain.BackgroundTransparency = 0.04
-notificationMain.BorderSizePixel = 0
-notificationMain.ClipsDescendants = true
-notificationMain.Position = UDim2.new(0.739, 0, 0.885, 0)
-notificationMain.Size = UDim2.new(0, 0, 0, 95)
-notificationMain.Parent = notificationHolder
+    local notificationMain = Instance.new("Frame")
+    notificationMain.Name = "NotificationMain"
+    notificationMain.BackgroundColor3 = Theme.Main
+    notificationMain.BackgroundTransparency = 0.04
+    notificationMain.BorderSizePixel = 0
+    notificationMain.ClipsDescendants = true
+    notificationMain.Position = UDim2.new(0.739, 0, 0.885, 0)
+    notificationMain.Size = UDim2.new(0, 0, 0, 95)
+    notificationMain.Parent = notificationHolder
 
-local notificationMainUIStroke = Instance.new("UIStroke")
-notificationMainUIStroke.Name = "NotificationMainUIStroke"
-notificationMainUIStroke.Color = Theme.MainUIStroke
-notificationMainUIStroke.Parent = notificationMain
-notificationMainUIStroke.Enabled = false
+    local notificationMainUIStroke = Instance.new("UIStroke")
+    notificationMainUIStroke.Name = "NotificationMainUIStroke"
+    notificationMainUIStroke.Color = Theme.MainUIStroke
+    notificationMainUIStroke.Parent = notificationMain
+    notificationMainUIStroke.Enabled = false
 
-local notificationMainUICorner = Instance.new("UICorner")
-notificationMainUICorner.Name = "NotificationMainUICorner"
-notificationMainUICorner.CornerRadius = UDim.new(0, 2)
-notificationMainUICorner.Parent = notificationMain
+    local notificationMainUICorner = Instance.new("UICorner")
+    notificationMainUICorner.Name = "NotificationMainUICorner"
+    notificationMainUICorner.CornerRadius = UDim.new(0, 2)
+    notificationMainUICorner.Parent = notificationMain
 
-local notificationName = Instance.new("TextLabel")
-notificationName.Name = "NotificationName"
-notificationName.Font = Enum.Font.GothamBold
-notificationName.Text = Info.Title
-notificationName.TextColor3 = Theme.SectionText
-notificationName.TextSize = 14
-notificationName.TextXAlignment = Enum.TextXAlignment.Left
-notificationName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-notificationName.BackgroundTransparency = 1
-notificationName.Position = UDim2.new(0, 6, 0, 0)
-notificationName.Size = UDim2.new(0, 330, 0, 34)
-notificationName.ZIndex = 2
-notificationName.Parent = notificationMain
+    local notificationName = Instance.new("TextLabel")
+    notificationName.Name = "NotificationName"
+    notificationName.Font = Enum.Font.GothamBold
+    notificationName.Text = Info.Title
+    notificationName.TextColor3 = Theme.SectionText
+    notificationName.TextSize = 14
+    notificationName.TextXAlignment = Enum.TextXAlignment.Left
+    notificationName.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    notificationName.BackgroundTransparency = 1
+    notificationName.Position = UDim2.new(0, 6, 0, 0)
+    notificationName.Size = UDim2.new(0, 330, 0, 34)
+    notificationName.ZIndex = 2
+    notificationName.Parent = notificationMain
 
-local topbar = Instance.new("Frame")
-topbar.Name = "Topbar"
-topbar.BackgroundColor3 = Theme.Topbar
-topbar.BorderSizePixel = 0
-topbar.Size = UDim2.new(1, 0, 0, 34)
-topbar.Parent = notificationMain
+    local topbar = Instance.new("Frame")
+    topbar.Name = "Topbar"
+    topbar.BackgroundColor3 = Theme.Topbar
+    topbar.BorderSizePixel = 0
+    topbar.Size = UDim2.new(1, 0, 0, 34)
+    topbar.Parent = notificationMain
 
-local topbarUICorner = Instance.new("UICorner")
-topbarUICorner.Name = "TopbarUICorner"
-topbarUICorner.CornerRadius = UDim.new(0, 2)
-topbarUICorner.Parent = topbar
+    local topbarUICorner = Instance.new("UICorner")
+    topbarUICorner.Name = "TopbarUICorner"
+    topbarUICorner.CornerRadius = UDim.new(0, 2)
+    topbarUICorner.Parent = topbar
 
-local notificationTopbarLine = Instance.new("Frame")
-notificationTopbarLine.Name = "NotificationTopbarLine"
-notificationTopbarLine.AnchorPoint = Vector2.new(0.5, 1)
-notificationTopbarLine.BackgroundColor3 = Theme.Lines
-notificationTopbarLine.BorderSizePixel = 0
-notificationTopbarLine.Position = UDim2.new(0.5, 0, 1, 0)
-notificationTopbarLine.Size = UDim2.new(1, 0, 0, 1)
-notificationTopbarLine.Parent = topbar
+    local notificationTopbarLine = Instance.new("Frame")
+    notificationTopbarLine.Name = "NotificationTopbarLine"
+    notificationTopbarLine.AnchorPoint = Vector2.new(0.5, 1)
+    notificationTopbarLine.BackgroundColor3 = Theme.Lines
+    notificationTopbarLine.BorderSizePixel = 0
+    notificationTopbarLine.Position = UDim2.new(0.5, 0, 1, 0)
+    notificationTopbarLine.Size = UDim2.new(1, 0, 0, 1)
+    notificationTopbarLine.Parent = topbar
 
-local notificationCloseButton = Instance.new("ImageButton")
-notificationCloseButton.Name = "NotificationCloseButton"
-notificationCloseButton.Image = "rbxassetid://10738425363"
-notificationCloseButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-notificationCloseButton.ImageColor3 = Theme.SectionText
-notificationCloseButton.BackgroundTransparency = 1
-notificationCloseButton.Position = UDim2.new(0, 315, 0, 9)
-notificationCloseButton.Size = UDim2.new(0, 17, 0, 17)
-notificationCloseButton.Visible = false
-notificationCloseButton.Parent = topbar
+    local notificationCloseButton = Instance.new("ImageButton")
+    notificationCloseButton.Name = "NotificationCloseButton"
+    notificationCloseButton.Image = "rbxassetid://10738425363"
+    notificationCloseButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    notificationCloseButton.ImageColor3 = Theme.SectionText
+    notificationCloseButton.BackgroundTransparency = 1
+    notificationCloseButton.Position = UDim2.new(0, 315, 0, 9)
+    notificationCloseButton.Size = UDim2.new(0, 17, 0, 17)
+    notificationCloseButton.Visible = false
+    notificationCloseButton.Parent = topbar
 
-local notificationTime = Instance.new("TextLabel")
-notificationTime.Name = "NotificationTime"
-notificationTime.Font = Enum.Font.GothamBold
-notificationTime.Text = "36"
-notificationTime.TextColor3 = Theme.SectionText
-notificationTime.TextSize = 14
-notificationTime.TextXAlignment = Enum.TextXAlignment.Right
-notificationTime.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-notificationTime.BackgroundTransparency = 1
-notificationTime.Position = UDim2.new(0, 6, 0, 0)
-notificationTime.Size = UDim2.new(0, 324, 0, 34)
-notificationTime.Visible = false
-notificationTime.ZIndex = 2
-notificationTime.Parent = topbar
+    local notificationTime = Instance.new("TextLabel")
+    notificationTime.Name = "NotificationTime"
+    notificationTime.Font = Enum.Font.GothamBold
+    notificationTime.Text = "36"
+    notificationTime.TextColor3 = Theme.SectionText
+    notificationTime.TextSize = 14
+    notificationTime.TextXAlignment = Enum.TextXAlignment.Right
+    notificationTime.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    notificationTime.BackgroundTransparency = 1
+    notificationTime.Position = UDim2.new(0, 6, 0, 0)
+    notificationTime.Size = UDim2.new(0, 324, 0, 34)
+    notificationTime.Visible = false
+    notificationTime.ZIndex = 2
+    notificationTime.Parent = topbar
 
-local textFrame = Instance.new("Frame")
-textFrame.Name = "TextFrame"
-textFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-textFrame.BackgroundTransparency = 1
-textFrame.Position = UDim2.new(0, 0, 0.358, 0)
-textFrame.Size = UDim2.new(1, 0, -0.0737, 68)
-textFrame.Parent = notificationMain
+    local textFrame = Instance.new("Frame")
+    textFrame.Name = "TextFrame"
+    textFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    textFrame.BackgroundTransparency = 1
+    textFrame.Position = UDim2.new(0, 0, 0.358, 0)
+    textFrame.Size = UDim2.new(1, 0, -0.0737, 68)
+    textFrame.Parent = notificationMain
 
-local notificationDescription = Instance.new("TextLabel")
-notificationDescription.Name = "NotificationDescription"
-notificationDescription.Font = Enum.Font.GothamBold
-notificationDescription.Text = Info.Description
-notificationDescription.TextColor3 = Theme.SectionText
-notificationDescription.TextSize = 13
-notificationDescription.TextWrapped = true
-notificationDescription.TextXAlignment = Enum.TextXAlignment.Left
-notificationDescription.TextYAlignment = Enum.TextYAlignment.Top
-notificationDescription.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-notificationDescription.BackgroundTransparency = 1
-notificationDescription.Position = UDim2.new(0, 6, 0, 6)
-notificationDescription.Size = UDim2.new(0, 330, 0, 55)
-notificationDescription.ZIndex = 2
-notificationDescription.Parent = textFrame
+    local notificationDescription = Instance.new("TextLabel")
+    notificationDescription.Name = "NotificationDescription"
+    notificationDescription.Font = Enum.Font.GothamBold
+    notificationDescription.Text = Info.Description
+    notificationDescription.TextColor3 = Theme.SectionText
+    notificationDescription.TextSize = 13
+    notificationDescription.TextWrapped = true
+    notificationDescription.TextXAlignment = Enum.TextXAlignment.Left
+    notificationDescription.TextYAlignment = Enum.TextYAlignment.Top
+    notificationDescription.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    notificationDescription.BackgroundTransparency = 1
+    notificationDescription.Position = UDim2.new(0, 6, 0, 6)
+    notificationDescription.Size = UDim2.new(0, 330, 0, 55)
+    notificationDescription.ZIndex = 2
+    notificationDescription.Parent = textFrame
 
-if not Info.Timeout then
-    notificationCloseButton.Visible = true
+    if not Info.Timeout then
+        notificationCloseButton.Visible = true
 
-    notificationCloseButton.MouseButton1Click:Connect(function()
-        task.spawn(Info.Callback)
-        
-        
-        local timedout = TweenService:Create(notificationMain, TweenInfo.new(0.25, Enum.EasingStyle.Quad, EaseDir), {Size = UDim2.new(0, 0, 0, 95)})
-        timedout:Play()
-        timedout.Completed:Wait()
-        notificationMainUIStroke.Enabled = false
-        notificationMain:Destroy()
-    end)
-end
+        notificationCloseButton.MouseButton1Click:Connect(function()
+            task.spawn(Info.Callback)
+            
+            
+            local timedout = TweenService:Create(notificationMain, TweenInfo.new(0.25, Enum.EasingStyle.Quad, EaseDir), {Size = UDim2.new(0, 0, 0, 95)})
+            timedout:Play()
+            timedout.Completed:Wait()
+            notificationMainUIStroke.Enabled = false
+            notificationMain:Destroy()
+        end)
+    end
 
-local show = TweenService:Create(notificationMain, TweenInfo.new(0.25, Enum.EasingStyle.Quad, EaseDir), {Size = UDim2.new(0, 336, 0, 95)})
-notificationMainUIStroke.Enabled = true
-show:Play()
+    local show = TweenService:Create(notificationMain, TweenInfo.new(0.25, Enum.EasingStyle.Quad, EaseDir), {Size = UDim2.new(0, 336, 0, 95)})
+    notificationMainUIStroke.Enabled = true
+    show:Play()
 
-if Info.Timeout then
-    notificationTime.Visible = true
-    local Timeout = Info.Timeout
-    notificationTime.Text = tostring(Timeout)
-    task.spawn(function()
-        while Timeout > 0 do
-            task.wait(1)
-            Timeout = Timeout - 1
-            notificationTime.Text = tostring(Timeout)
-        end
-        task.spawn(Info.Callback)
-        local timedout = TweenService:Create(notificationMain, TweenInfo.new(0.25, Enum.EasingStyle.Quad, EaseDir), {Size = UDim2.new(0, 0, 0, 95)})
-        timedout:Play()
-        timedout.Completed:Wait()
-        notificationMainUIStroke.Enabled = false
-        notificationMain:Destroy()
-    end)
-end
+    if Info.Timeout then
+        notificationTime.Visible = true
+        local Timeout = Info.Timeout
+        notificationTime.Text = tostring(Timeout)
+        task.spawn(function()
+            while Timeout > 0 do
+                task.wait(1)
+                Timeout = Timeout - 1
+                notificationTime.Text = tostring(Timeout)
+            end
+            task.spawn(Info.Callback)
+            local timedout = TweenService:Create(notificationMain, TweenInfo.new(0.25, Enum.EasingStyle.Quad, EaseDir), {Size = UDim2.new(0, 0, 0, 95)})
+            timedout:Play()
+            timedout.Completed:Wait()
+            notificationMainUIStroke.Enabled = false
+            notificationMain:Destroy()
+        end)
+    end
 end
 
 function library:Window(Info)
@@ -824,12 +825,16 @@ function library:Window(Info)
 
             itemContainer.ChildAdded:Connect(function(v)
                 if v.ClassName ~= "UIListLayout" then
-                    if v.Name ~= "Slider" then
-                    SectionY = SectionY + 28
-                    ContainerY = ContainerY + 28
-                    else
-                    SectionY = SectionY + 36
-                    ContainerY = ContainerY + 36
+                    print(v.Name)
+                    if ( v.Name == 'Label' ) then
+                        SectionY = SectionY + 18
+                        ContainerY = ContainerY + 18 
+                    elseif ( v.Name == 'Slider' ) then 
+                        SectionY = SectionY + 36
+                        ContainerY = ContainerY + 36
+                    else 
+                        SectionY = SectionY + 28
+                        ContainerY = ContainerY + 28
                     end
                 end
             end)
@@ -1701,6 +1706,45 @@ function library:Window(Info)
                 buttonTextButton.MouseButton1Click:Connect(function()
                     task.spawn(Info.Callback)
                 end)
+            end
+
+            function sectiontable:Label(Info)
+                Info.Text = Info.Text or "Label"
+                Info.Color = Info.Color or Theme.ItemText
+
+                local label = Instance.new("Frame")
+                label.Name = "Label"
+                label.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                label.BackgroundTransparency = 1
+                label.Size = UDim2.new(0, 175, 0, 18)
+                label.Parent = itemContainer
+
+                local labelFrame = Instance.new("Frame")
+                labelFrame.Name = "LabelFrame"
+                labelFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+                labelFrame.BackgroundColor3 = Theme.ItemFrame
+                labelFrame.BorderSizePixel = 0
+                labelFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+                labelFrame.Size = UDim2.new(0, 171, 0, 14)
+                labelFrame.Parent = label
+
+                local labelUIStroke = Instance.new("UIStroke")
+                labelUIStroke.Name = "labelUIStroke"
+                labelUIStroke.Color = Theme.ItemUIStroke
+                labelUIStroke.Parent = labelFrame
+
+                local labelText = Instance.new("TextLabel")
+                labelText.Name = "LabelText"
+                labelText.Font = Enum.Font.GothamBold
+                labelText.Text = Info.Text
+                labelText.TextColor3 = Theme.ItemText
+                labelText.TextSize = 10
+                labelText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                labelText.BackgroundTransparency = 1
+                labelText.Size = UDim2.new(0, 171, 0, 14)
+                labelText.TextXAlignment = 'Left'
+                labelText.TextWrapped = true 
+                labelText.Parent = labelFrame
             end
 
             return sectiontable
