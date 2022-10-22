@@ -1,15 +1,18 @@
 -- Forked by topit 
 -- Original by Rain-Design // Shaddow 
 
--- * Added library.KillCallback, gets called when library exits
+-- * Added library.KillCallback, which gets called when library exits
 -- * Switched a few waits to task.wait
 -- * Cleaned up some formatting 
 -- * Localized easing variables
+-- * Added library.Toggles, a table containing every toggle 
+-- * Added toggle.State, self explanatory
 
 local library = {
     Flags = {},
     SectionsOpened = false,
-    Theme = "Dark"
+    Theme = "Dark",
+    Toggles = {}
 }
 library.flags = library.Flags
 library.theme = library.Theme
@@ -1602,15 +1605,18 @@ function library:Window(Info)
                 toggleInner.Parent = toggleOuter
 
                 function toggletable:Set(bool)
-                Enabled = bool
-                if Info.Flag then
-                    library.Flags[Info.Flag] = bool
-                end
-                TweenService:Create(toggleOuter, TweenInfo.new(0.125, EaseStyle, EaseDir), {BackgroundColor3 = bool and Theme.ToggleOuterEnabled or Theme.ToggleOuter}):Play()
-                TweenService:Create(toggleInner, TweenInfo.new(0.125, EaseStyle, EaseDir), {ImageColor3 = bool and Theme.ToggleInnerEnabled or Theme.ToggleInner}):Play()
-                TweenService:Create(toggleInner, TweenInfo.new(0.125, EaseStyle, EaseDir), {Position = bool and UDim2.new(0, 18, 0, 2) or UDim2.new(0, 2, 0, 2)}):Play()
-                TweenService:Create(toggleOuterUIStroke, TweenInfo.new(0.125, EaseStyle, EaseDir), {Color = bool and Theme.ToggleOuterUIStrokeEnabled or Theme.ToggleOuterUIStroke}):Play()
-                task.spawn(Info.Callback, bool)
+                    Enabled = bool
+                    toggletable.State = Enabled
+                    
+                    if Info.Flag then
+                        library.Flags[Info.Flag] = bool
+                    end
+                    TweenService:Create(toggleOuter, TweenInfo.new(0.125, EaseStyle, EaseDir), {BackgroundColor3 = bool and Theme.ToggleOuterEnabled or Theme.ToggleOuter}):Play()
+                    TweenService:Create(toggleInner, TweenInfo.new(0.125, EaseStyle, EaseDir), {ImageColor3 = bool and Theme.ToggleInnerEnabled or Theme.ToggleInner}):Play()
+                    TweenService:Create(toggleInner, TweenInfo.new(0.125, EaseStyle, EaseDir), {Position = bool and UDim2.new(0, 18, 0, 2) or UDim2.new(0, 2, 0, 2)}):Play()
+                    TweenService:Create(toggleOuterUIStroke, TweenInfo.new(0.125, EaseStyle, EaseDir), {Color = bool and Theme.ToggleOuterUIStrokeEnabled or Theme.ToggleOuterUIStroke}):Play()
+                    
+                    task.spawn(Info.Callback, bool)
                 end
 
                 if Info.Default then
@@ -1623,6 +1629,8 @@ function library:Window(Info)
                     toggletable:Set(Enabled)
                 end)
 
+                table.insert(library.Toggles, toggletable)
+                
                 return toggletable
             end
 
