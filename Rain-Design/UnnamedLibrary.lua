@@ -493,13 +493,13 @@ function library:Window(Info)
     end)
 
     closeButton.MouseButton1Click:Connect(function()
+        if ( library.KillCallback ) then
+            library.KillCallback() -- not spawned for synchronicity 
+        end
+        
         unnamed:Destroy()
         shadow:Destroy()
         notifications:Destroy()
-        
-        if ( library.KillCallback ) then
-            task.spawn(library.KillCallback)
-        end
     end)
 
     local minimizeButton = Instance.new("ImageButton")
