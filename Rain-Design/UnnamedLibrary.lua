@@ -1741,7 +1741,8 @@ function library:Window(Info)
                 labelText.TextSize = 10
                 labelText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                 labelText.BackgroundTransparency = 1
-                labelText.Size = UDim2.new(0, 171, 0, 14)
+                labelText.Size = UDim2.fromOffset(167, 14)
+                labelText.Position = UDim2.fromOffset(4, 0)
                 labelText.TextXAlignment = 'Left'
                 labelText.TextWrapped = true 
                 labelText.Parent = labelFrame
