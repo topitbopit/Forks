@@ -825,7 +825,6 @@ function library:Window(Info)
 
             itemContainer.ChildAdded:Connect(function(v)
                 if v.ClassName ~= "UIListLayout" then
-                    print(v.Name)
                     if ( v.Name == 'Label' ) then
                         SectionY = SectionY + 18
                         ContainerY = ContainerY + 18 
@@ -1737,7 +1736,7 @@ function library:Window(Info)
                 labelText.Name = "LabelText"
                 labelText.Font = Enum.Font.GothamBold
                 labelText.Text = Info.Text
-                labelText.TextColor3 = Theme.ItemText
+                labelText.TextColor3 = Info.Color
                 labelText.TextSize = 10
                 labelText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                 labelText.BackgroundTransparency = 1
