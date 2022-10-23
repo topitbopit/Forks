@@ -8,6 +8,7 @@
 -- * Added library.Toggles, a table containing every toggle 
 -- * Added toggle.State, self explanatory
 -- * Added section:Label
+-- * Added support for tooltips. Just set .Tooltip on whatever instance you're creating
 
 local library = {
     Flags = {},
@@ -127,6 +128,7 @@ local HttpService = game:GetService("HttpService")
 local CoreGui = game:GetService("CoreGui")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
 local Mouse = game:GetService('Players').LocalPlayer:GetMouse()
 
@@ -143,21 +145,21 @@ local isfolder = isfolder or syn_isfolder or is_folder
 local makefolder = makefolder or make_folder or createfolder or create_folder
 
 if not isfolder("Unnamed") then
-makefolder("Unnamed")
-    
-local Shadow = request({Url = "https://raw.githubusercontent.com/Rain-Design/Unnamed/main/Icons/UnnamedShadow.png", Method = "GET"})
-writefile("Unnamed/Shadow.png", Shadow.Body)
+    makefolder("Unnamed")
+        
+    local Shadow = request({Url = "https://raw.githubusercontent.com/Rain-Design/Unnamed/main/Icons/UnnamedShadow.png", Method = "GET"})
+    writefile("Unnamed/Shadow.png", Shadow.Body)
 
-local Chevron = request({Url = "https://raw.githubusercontent.com/Rain-Design/Unnamed/main/Icons/Chevron.png", Method = "GET"})
-writefile("Unnamed/Chevron.png", Chevron.Body)
+    local Chevron = request({Url = "https://raw.githubusercontent.com/Rain-Design/Unnamed/main/Icons/Chevron.png", Method = "GET"})
+    writefile("Unnamed/Chevron.png", Chevron.Body)
 
-local Circle = request({Url = "https://raw.githubusercontent.com/Rain-Design/Unnamed/main/Icons/Circle.png", Method = "GET"})
-writefile("Unnamed/Circle.png", Circle.Body)
+    local Circle = request({Url = "https://raw.githubusercontent.com/Rain-Design/Unnamed/main/Icons/Circle.png", Method = "GET"})
+    writefile("Unnamed/Circle.png", Circle.Body)
 end
 
 local SelectedTab = nil
 
-function  library:Darken(clr3)
+function library:Darken(clr3)
 	local z,x,brightness = clr3:ToHSV()
 	brightness = math.clamp(brightness - 0.5, 0, 1)
 	
@@ -183,20 +185,21 @@ notificationHolder.BackgroundTransparency = 1
 notificationHolder.Position = UDim2.new(0, 0, 0.5, 0)
 notificationHolder.Size = UDim2.new(1, 0, 1, 100)
 notificationHolder.Parent = notifications
+do
+    local uIListLayout = Instance.new("UIListLayout")
+    uIListLayout.Name = "UIListLayout"
+    uIListLayout.Padding = UDim.new(0, 3)
+    uIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+    uIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    uIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+    uIListLayout.Parent = notificationHolder
 
-local uIListLayout = Instance.new("UIListLayout")
-uIListLayout.Name = "UIListLayout"
-uIListLayout.Padding = UDim.new(0, 3)
-uIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
-uIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-uIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
-uIListLayout.Parent = notificationHolder
-
-local uIPadding = Instance.new("UIPadding")
-uIPadding.Name = "UIPadding"
-uIPadding.PaddingBottom = UDim.new(0, 55)
-uIPadding.PaddingRight = UDim.new(0, 5)
-uIPadding.Parent = notificationHolder
+    local uIPadding = Instance.new("UIPadding")
+    uIPadding.Name = "UIPadding"
+    uIPadding.PaddingBottom = UDim.new(0, 55)
+    uIPadding.PaddingRight = UDim.new(0, 5)
+    uIPadding.Parent = notificationHolder
+end
 
 function library:Notification(Info)
     Info.Title = Info.Title or "Notification"
@@ -364,6 +367,56 @@ function library:Window(Info)
         error("There's no theme called: "..library.Theme, 0)
     end
 
+
+    local tooltips = Instance.new("ScreenGui")
+    tooltips.Name = "Tooltips"
+    tooltips.IgnoreGuiInset = true 
+    tooltips.DisplayOrder = 300
+    tooltips.Parent = CoreGui
+    
+    local tooltip = Instance.new("Frame")
+    tooltip.Name = "Tooltip"
+    tooltip.AnchorPoint = Vector2.new(0, 0)
+    tooltip.BackgroundColor3 = Theme.TabFrame
+    tooltip.Visible = false
+    tooltip.Position = UDim2.fromOffset()
+    tooltip.Size = UDim2.new(0, 100, 0, 19)
+    tooltip.ZIndex = 5
+    tooltip.Parent = tooltips
+    do
+        local newuICorner = Instance.new("UICorner")
+        newuICorner.Name = "UICorner"
+        newuICorner.CornerRadius = UDim.new(0, 3)
+        newuICorner.Parent = tooltip
+    
+        local newuIStroke = Instance.new("UIStroke")
+        newuIStroke.Name = "UIStroke"
+        newuIStroke.Color = Theme.TabUIStroke
+        newuIStroke.Parent = tooltip
+    end
+    local tooltipText = Instance.new("TextLabel")
+    tooltipText.Name = "TooltipText"
+    tooltipText.Font = Enum.Font.GothamBold
+    tooltipText.Text = ''
+    tooltipText.TextColor3 = Theme.TabText
+    tooltipText.TextSize = 11
+    tooltipText.BackgroundTransparency = 1
+    tooltipText.Size = UDim2.new(0, 100, 0, 19)
+    tooltipText.Parent = tooltip
+    tooltipText.ZIndex = 6
+    
+    tooltipText:GetPropertyChangedSignal('Text'):Connect(function() 
+        local TextBounds = tooltipText.TextBounds
+    
+        tooltip.Size = UDim2.fromOffset(TextBounds.X + 10, 19)
+        tooltipText.Size = UDim2.fromOffset(TextBounds.X + 10, 19)
+    end)
+    
+    local tooltipCn = RunService.Heartbeat:Connect(function() 
+        local position = UserInputService:GetMouseLocation()
+        tooltip.Position = UDim2.fromOffset(position.X + 15, position.Y + 15)
+    end)
+    
     local window = {}
 
     local unnamed = Instance.new("ScreenGui")
@@ -421,7 +474,7 @@ function library:Window(Info)
     end
 
     topbar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType.Name == 'MouseButton1' or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = main.Position
@@ -498,9 +551,12 @@ function library:Window(Info)
             library.KillCallback() -- not spawned for synchronicity 
         end
         
+        tooltipCn:Disconnect()
+        
         unnamed:Destroy()
         shadow:Destroy()
         notifications:Destroy()
+        tooltips:Destroy()
     end)
 
     local minimizeButton = Instance.new("ImageButton")
@@ -650,12 +706,17 @@ function library:Window(Info)
         tabName.BackgroundTransparency = 1
         tabName.Size = UDim2.new(0, 118, 0, 25)
         tabName.Parent = tabFrame
-
+        
         tabFrame.MouseEnter:Connect(function()
             if SelectedTab == nil or SelectedTab ~= tab then
                 TweenService:Create(tabFrame, TweenInfo.new(0.125, EaseStyle, EaseDir), {BackgroundColor3 = Theme.HoverTabFrame}):Play()
                 TweenService:Create(tabName, TweenInfo.new(0.2, EaseStyle, EaseDir), {Size = UDim2.new(0, 122,0, 25)}):Play()
                 TweenService:Create(tabFrame, TweenInfo.new(0.2, EaseStyle, EaseDir), {Size = UDim2.new(0, 122,0, 25)}):Play()
+            end
+            
+            if ( Info.Tooltip ) then
+                tooltip.Visible = true 
+                tooltipText.Text = Info.Tooltip 
             end
         end)
 
@@ -664,6 +725,10 @@ function library:Window(Info)
                 TweenService:Create(tabFrame, TweenInfo.new(0.125, EaseStyle, EaseDir), {BackgroundColor3 = Theme.TabFrame}):Play()
                 TweenService:Create(tabFrame, TweenInfo.new(0.2, EaseStyle, EaseDir), {Size = UDim2.new(0, 118,0, 25)}):Play()
                 TweenService:Create(tabName, TweenInfo.new(0.2, EaseStyle, EaseDir), {Size = UDim2.new(0, 118,0, 25)}):Play()
+            end
+            
+            if ( Info.Tooltip and tooltipText.Text == Info.Tooltip ) then
+                tooltip.Visible = false
             end
         end)
 
@@ -857,7 +922,7 @@ function library:Window(Info)
 
             task.spawn(function()
                 if Info.Opened then
-                    for i = 1,3 do
+                    for i = 1, 3 do
                         sectiontable:Select()
                         task.wait()
                     end
@@ -879,125 +944,134 @@ function library:Window(Info)
             sectionUIStroke.Parent = sectionFrame
 
             function sectiontable:Keybind(Info)
-            Info.Text = Info.Text or "Keybind"
-            Info.Default = Info.Default or Enum.KeyCode.Alt
-            Info.Callback = Info.Callback or BlankFn
+                Info.Text = Info.Text or "Keybind"
+                Info.Default = Info.Default or Enum.KeyCode.Alt
+                Info.Callback = Info.Callback or BlankFn
 
-            local PressKey = Info.Default
+                local PressKey = Info.Default
 
-            local keybind = Instance.new("Frame")
-            keybind.Name = "Keybind"
-            keybind.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            keybind.BackgroundTransparency = 1
-            keybind.Size = UDim2.new(0, 175, 0, 28)
-            keybind.Parent = itemContainer
+                local keybind = Instance.new("Frame")
+                keybind.Name = "Keybind"
+                keybind.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                keybind.BackgroundTransparency = 1
+                keybind.Size = UDim2.new(0, 175, 0, 28)
+                keybind.Parent = itemContainer
 
-            local keybindFrame = Instance.new("Frame")
-            keybindFrame.Name = "KeybindFrame"
-            keybindFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-            keybindFrame.BackgroundColor3 = Theme.ItemFrame
-            keybindFrame.BorderSizePixel = 0
-            keybindFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-            keybindFrame.Size = UDim2.new(0, 171, 0, 24)
-            keybindFrame.Parent = keybind
+                local keybindFrame = Instance.new("Frame")
+                keybindFrame.Name = "KeybindFrame"
+                keybindFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+                keybindFrame.BackgroundColor3 = Theme.ItemFrame
+                keybindFrame.BorderSizePixel = 0
+                keybindFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+                keybindFrame.Size = UDim2.new(0, 171, 0, 24)
+                keybindFrame.Parent = keybind
 
-            local keybindText = Instance.new("TextLabel")
-            keybindText.Name = "KeybindText"
-            keybindText.Font = Enum.Font.GothamBold
-            keybindText.Text = Info.Text
-            keybindText.TextColor3 = Theme.ItemText
-            keybindText.TextSize = 12
-            keybindText.TextXAlignment = Enum.TextXAlignment.Left
-            keybindText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            keybindText.BackgroundTransparency = 1
-            keybindText.Position = UDim2.new(0.0234, 0, 0, 0)
-            keybindText.Size = UDim2.new(0, 167, 0, 24)
-            keybindText.Parent = keybindFrame
+                local keybindText = Instance.new("TextLabel")
+                keybindText.Name = "KeybindText"
+                keybindText.Font = Enum.Font.GothamBold
+                keybindText.Text = Info.Text
+                keybindText.TextColor3 = Theme.ItemText
+                keybindText.TextSize = 12
+                keybindText.TextXAlignment = Enum.TextXAlignment.Left
+                keybindText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                keybindText.BackgroundTransparency = 1
+                keybindText.Position = UDim2.new(0.0234, 0, 0, 0)
+                keybindText.Size = UDim2.new(0, 167, 0, 24)
+                keybindText.Parent = keybindFrame
 
-            local keybindTextButton = Instance.new("TextButton")
-            keybindTextButton.Name = "keybindTextButton"
-            keybindTextButton.Font = Enum.Font.SourceSans
-            keybindTextButton.Text = ""
-            keybindTextButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-            keybindTextButton.TextSize = 14
-            keybindTextButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            keybindTextButton.BackgroundTransparency = 1
-            keybindTextButton.Size = UDim2.new(0, 171, 0, 24)
-            keybindTextButton.Parent = keybindFrame
+                local keybindTextButton = Instance.new("TextButton")
+                keybindTextButton.Name = "keybindTextButton"
+                keybindTextButton.Font = Enum.Font.SourceSans
+                keybindTextButton.Text = ""
+                keybindTextButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+                keybindTextButton.TextSize = 14
+                keybindTextButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                keybindTextButton.BackgroundTransparency = 1
+                keybindTextButton.Size = UDim2.new(0, 171, 0, 24)
+                keybindTextButton.Parent = keybindFrame
 
-            local keybindUIStroke = Instance.new("UIStroke")
-            keybindUIStroke.Name = "keybindUIStroke"
-            keybindUIStroke.Color = Theme.ItemUIStroke
-            keybindUIStroke.Parent = keybindFrame
+                local keybindUIStroke = Instance.new("UIStroke")
+                keybindUIStroke.Name = "keybindUIStroke"
+                keybindUIStroke.Color = Theme.ItemUIStroke
+                keybindUIStroke.Parent = keybindFrame
 
-            local keybindOuter = Instance.new("Frame")
-            keybindOuter.Name = "KeybindOuter"
-            keybindOuter.AnchorPoint = Vector2.new(1, 0)
-            keybindOuter.BackgroundColor3 = Theme.ToggleOuter
-            keybindOuter.Position = UDim2.new(0.152, 139, 0.125, 2)
-            keybindOuter.Size = UDim2.new(0, 30, 0, 14)
-            keybindOuter.Parent = keybindFrame
+                local keybindOuter = Instance.new("Frame")
+                keybindOuter.Name = "KeybindOuter"
+                keybindOuter.AnchorPoint = Vector2.new(1, 0)
+                keybindOuter.BackgroundColor3 = Theme.ToggleOuter
+                keybindOuter.Position = UDim2.new(0.152, 139, 0.125, 2)
+                keybindOuter.Size = UDim2.new(0, 30, 0, 14)
+                keybindOuter.Parent = keybindFrame
 
-            local keybindOuterUIStroke = Instance.new("UIStroke")
-            keybindOuterUIStroke.Name = "keybindOuterUIStroke"
-            keybindOuterUIStroke.Color = Theme.ToggleOuterUIStroke
-            keybindOuterUIStroke.Parent = keybindOuter
+                local keybindOuterUIStroke = Instance.new("UIStroke")
+                keybindOuterUIStroke.Name = "keybindOuterUIStroke"
+                keybindOuterUIStroke.Color = Theme.ToggleOuterUIStroke
+                keybindOuterUIStroke.Parent = keybindOuter
 
-            local keybindUICorner = Instance.new("UICorner")
-            keybindUICorner.Name = "keybindUICorner"
-            keybindUICorner.CornerRadius = UDim.new(0, 2)
-            keybindUICorner.Parent = keybindOuter
+                local keybindUICorner = Instance.new("UICorner")
+                keybindUICorner.Name = "keybindUICorner"
+                keybindUICorner.CornerRadius = UDim.new(0, 2)
+                keybindUICorner.Parent = keybindOuter
 
-            local keybindOuterText = Instance.new("TextLabel")
-            keybindOuterText.Name = "KeybindOuterText"
-            keybindOuterText.Font = Enum.Font.GothamBold
-            keybindOuterText.Text = PressKey.Name
-            keybindOuterText.TextColor3 = Color3.fromRGB(232, 232, 232)
-            keybindOuterText.TextSize = 12
-            keybindOuterText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            keybindOuterText.BackgroundTransparency = 1
-            keybindOuterText.Size = UDim2.new(1, 0, 0, 14)
-            keybindOuterText.Parent = keybindOuter
-
-            keybindFrame.MouseEnter:Connect(function()
-                TweenService:Create(keybindFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.HoverItemFrame}):Play()
-            end)
-
-            keybindFrame.MouseLeave:Connect(function()
-                TweenService:Create(keybindFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.ItemFrame}):Play()
-            end)
-
-            local TextBounds = keybindOuterText.TextBounds
-
-            keybindOuter.Size = UDim2.new(0, TextBounds.X + 10, 0, 14)
-
-            keybindOuterText:GetPropertyChangedSignal("Text"):Connect(function()
-                TextBounds = keybindOuterText.TextBounds
+                local keybindOuterText = Instance.new("TextLabel")
+                keybindOuterText.Name = "KeybindOuterText"
+                keybindOuterText.Font = Enum.Font.GothamBold
+                keybindOuterText.Text = PressKey.Name
+                keybindOuterText.TextColor3 = Color3.fromRGB(232, 232, 232)
+                keybindOuterText.TextSize = 12
+                keybindOuterText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                keybindOuterText.BackgroundTransparency = 1
+                keybindOuterText.Size = UDim2.new(1, 0, 0, 14)
+                keybindOuterText.Parent = keybindOuter
                 
-                keybindOuter.Size = UDim2.new(0, TextBounds.X + 10, 0, 14)
-            end)
-
-            local KeybindConnection
-            local Changing = false
-
-            keybindTextButton.MouseButton1Click:Connect(function()
-                if KeybindConnection then KeybindConnection:Disconnect() end
-                Changing = true
-                keybindOuterText.Text = "..."
-                keybindOuterUIStroke.Color = Theme.ItemUIStrokeSelected
-                KeybindConnection = UserInputService.InputBegan:Connect(function(Key, gameProcessed)
-                    if not table.find(Blacklist, Key.KeyCode) and not gameProcessed then
-                        KeybindConnection:Disconnect()
-                        keybindOuterText.Text = Key.KeyCode.Name
-                        keybindOuterUIStroke.Color = Theme.ToggleOuterUIStroke
-                        PressKey = Key.KeyCode
-                        task.wait(0.1)
-                        Changing = false
+                keybindFrame.MouseEnter:Connect(function()
+                    TweenService:Create(keybindFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.HoverItemFrame}):Play()
+                    
+                    if ( Info.Tooltip ) then
+                        tooltip.Visible = true 
+                        tooltipText.Text = Info.Tooltip 
                     end
                 end)
-            end)
 
-            UserInputService.InputBegan:Connect(function(Key, gameProcessed)
+                keybindFrame.MouseLeave:Connect(function()
+                    TweenService:Create(keybindFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.ItemFrame}):Play()
+                    
+                    if ( Info.Tooltip and tooltipText.Text == Info.Tooltip ) then
+                        tooltip.Visible = false
+                    end
+                end)
+
+                local TextBounds = keybindOuterText.TextBounds
+
+                keybindOuter.Size = UDim2.new(0, TextBounds.X + 10, 0, 14)
+
+                keybindOuterText:GetPropertyChangedSignal("Text"):Connect(function()
+                    TextBounds = keybindOuterText.TextBounds
+                    
+                    keybindOuter.Size = UDim2.new(0, TextBounds.X + 10, 0, 14)
+                end)
+
+                local KeybindConnection
+                local Changing = false
+
+                keybindTextButton.MouseButton1Click:Connect(function()
+                    if KeybindConnection then KeybindConnection:Disconnect() end
+                    Changing = true
+                    keybindOuterText.Text = "..."
+                    keybindOuterUIStroke.Color = Theme.ItemUIStrokeSelected
+                    KeybindConnection = UserInputService.InputBegan:Connect(function(Key, gameProcessed)
+                        if not table.find(Blacklist, Key.KeyCode) and not gameProcessed then
+                            KeybindConnection:Disconnect()
+                            keybindOuterText.Text = Key.KeyCode.Name
+                            keybindOuterUIStroke.Color = Theme.ToggleOuterUIStroke
+                            PressKey = Key.KeyCode
+                            task.wait(0.1)
+                            Changing = false
+                        end
+                    end)
+                end)
+
+                UserInputService.InputBegan:Connect(function(Key, gameProcessed)
                     if not Changing and Key.KeyCode == PressKey and not gameProcessed then
                         task.spawn(Info.Callback)
                     end
@@ -1114,14 +1188,23 @@ function library:Window(Info)
                 dragButton.BackgroundTransparency = 1
                 dragButton.Size = UDim2.new(0, 9, 0, 9)
                 dragButton.Parent = dragIcon
-
+                
                 sliderFrame.MouseEnter:Connect(function()
                     TweenService:Create(sliderFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.HoverItemFrame}):Play()
+                    
+                    if ( Info.Tooltip ) then
+                        tooltip.Visible = true 
+                        tooltipText.Text = Info.Tooltip 
+                    end
                 end)
 
                 sliderFrame.MouseLeave:Connect(function()
                     TweenService:Create(sliderFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.ItemFrame}):Play()
                     TweenService:Create(sliderUIStroke, TweenInfo.new(0.1, EaseStyle, EaseDir), {Color = Theme.ItemUIStroke}):Play()
+                    
+                    if ( Info.Tooltip and tooltipText.Text == Info.Tooltip ) then
+                        tooltip.Visible = false
+                    end
                 end)
 
                 dragButton.MouseButton1Down:Connect(function()
@@ -1166,9 +1249,9 @@ function library:Window(Info)
                         end
                     end)
                 end)
-                end
+            end
 
-                function sectiontable:Input(Info)
+            function sectiontable:Input(Info)
                 Info.Text = Info.Text or "Input"
                 Info.Flag = Info.Flag or nil
                 Info.Callback = Info.Callback or BlankFn
@@ -1208,13 +1291,22 @@ function library:Window(Info)
                 textBox.BackgroundTransparency = 1
                 textBox.Size = UDim2.new(0, 171, 0, 24)
                 textBox.Parent = inputFrame
-
+                
                 inputFrame.MouseEnter:Connect(function()
                     TweenService:Create(inputFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.HoverItemFrame}):Play()
+                    
+                    if ( Info.Tooltip ) then
+                        tooltip.Visible = true 
+                        tooltipText.Text = Info.Tooltip 
+                    end         
                 end)
 
                 inputFrame.MouseLeave:Connect(function()
                     TweenService:Create(inputFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.ItemFrame}):Play()
+                    
+                    if ( Info.Tooltip and tooltipText.Text == Info.Tooltip ) then
+                        tooltip.Visible = false
+                    end
                 end)
 
                 textBox.Focused:Connect(function()
@@ -1312,14 +1404,23 @@ function library:Window(Info)
                 dropdownUIListLayout.Name = "dropdownUIListLayout"
                 dropdownUIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
                 dropdownUIListLayout.Parent = dropdownContainer
-
+                
                 dropdownFrame.MouseEnter:Connect(function()
                     TweenService:Create(dropdownFrame, TweenInfo.new(0.125, EaseStyle, EaseDir), {BackgroundColor3 = Theme.HoverItemFrame}):Play()
+                    
+                    if ( Info.Tooltip ) then
+                        tooltip.Visible = true 
+                        tooltipText.Text = Info.Tooltip 
+                    end
                 end)
 
                 dropdownFrame.MouseLeave:Connect(function()
                     TweenService:Create(dropdownFrame, TweenInfo.new(0.125, EaseStyle, EaseDir), {BackgroundColor3 = Theme.ItemFrame}):Play()
                     TweenService:Create(dropdownUIStroke, TweenInfo.new(0.125, EaseStyle, EaseDir), {Color = Theme.ItemUIStroke}):Play()
+                    
+                    if ( Info.Tooltip and tooltipText.Text == Info.Tooltip ) then
+                        tooltip.Visible = false
+                    end
                 end)
 
                 dropdownTextButton.MouseButton1Down:Connect(function()
@@ -1345,88 +1446,88 @@ function library:Window(Info)
                 local DropdownOpened = false
 
                 function insidedropdown:Add(str)
-                DropdownY = DropdownY + 24
-
-                if DropdownOpened then
-                    TweenService:Create(section, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = UDim2.new(0, 175, 0, section.Size.Y.Offset + 24)}):Play()
-                    TweenService:Create(sectionFrame, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = UDim2.new(0, 175, 0, sectionFrame.Size.Y.Offset + 24)}):Play()
-                    TweenService:Create(itemContainer, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = UDim2.new(0, 175, 0, itemContainer.Size.Y.Offset + 24)}):Play()
-                    TweenService:Create(dropdown, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = UDim2.new(0, 175, 0, dropdown.Size.Y.Offset + 24)}):Play()
-                    TweenService:Create(dropdownFrame, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = UDim2.new(0, 171, 0, dropdownFrame.Size.Y.Offset + 24)}):Play()
-                    TweenService:Create(dropdownContainer, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = UDim2.new(0, 171, 0, dropdownContainer.Size.Y.Offset + 24)}):Play()
-                    task.wait(0.1)
-                end
-
-                local dropdownElement = Instance.new("Frame")
-                dropdownElement.Name = "dropdownElement"
-                dropdownElement.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                dropdownElement.BackgroundTransparency = 1
-                dropdownElement.Size = UDim2.new(0, 171, 0, 24)
-                dropdownElement.ZIndex = 2
-                dropdownElement.Parent = dropdownContainer
-
-                local dropdownElementText = Instance.new("TextLabel")
-                dropdownElementText.Name = "dropdownElementText"
-                dropdownElementText.Font = Enum.Font.GothamBold
-                dropdownElementText.Text = str
-                dropdownElementText.TextColor3 = Theme.ItemText
-                dropdownElementText.TextSize = 12
-                dropdownElementText.TextXAlignment = Enum.TextXAlignment.Left
-                dropdownElementText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                dropdownElementText.BackgroundTransparency = 1
-                dropdownElementText.Position = UDim2.new(0.0234, 0, 0, 0)
-                dropdownElementText.Size = UDim2.new(0, 167, 0, 24)
-                dropdownElementText.Parent = dropdownElement
-
-                local dropdownElementButton = Instance.new("TextButton")
-                dropdownElementButton.Name = "dropdownElementButton"
-                dropdownElementButton.Font = Enum.Font.SourceSans
-                dropdownElementButton.Text = ""
-                dropdownElementButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-                dropdownElementButton.TextSize = 14
-                dropdownElementButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                dropdownElementButton.BackgroundTransparency = 1
-                dropdownElementButton.Size = UDim2.new(0, 171, 0, 24)
-                dropdownElementButton.Parent = dropdownElement
-
-                dropdownElement.MouseEnter:Connect(function()
-                    TweenService:Create(dropdownElementText, TweenInfo.new(0.125, EaseStyle, EaseDir), {TextColor3 = Theme.Highlight}):Play()
-                end)
-
-                dropdownElement.MouseLeave:Connect(function()
-                    TweenService:Create(dropdownElementText, TweenInfo.new(0.125, EaseStyle, EaseDir), {TextColor3 = Theme.ItemText}):Play()
-                end)
-
-                dropdownElementButton.MouseButton1Click:Connect(function()
-                    task.spawn(Info.Callback, dropdownElementText.Text)
-                    if Info.Flag then
-                        library.Flags[Info.Flag] = dropdownElementText.Text
-                    end
-                    if Info.ChangeTextOnPick then
-                        dropdownText.Text = dropdownElementText.Text
-                    end
-                    
-                    TweenService:Create(dropdownFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.ItemFrame}):Play()
-                    TweenService:Create(dropdownUIStroke, TweenInfo.new(0.1, EaseStyle, EaseDir), {Color = Theme.ItemUIStroke}):Play()
-
-                    DropdownOpened = false
+                    DropdownY = DropdownY + 24
 
                     if DropdownOpened then
-                        containerHolder.ClipsDescendants = false
-                    end
-                    TweenService:Create(section, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = DropdownOpened and UDim2.new(0, 175, 0, section.Size.Y.Offset + (DropdownY)) or UDim2.new(0, 175, 0, section.Size.Y.Offset - (DropdownY))}):Play()
-                    TweenService:Create(sectionFrame, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = DropdownOpened and UDim2.new(0, 175, 0, sectionFrame.Size.Y.Offset + (DropdownY)) or UDim2.new(0, 175, 0, sectionFrame.Size.Y.Offset - (DropdownY))}):Play()
-                    TweenService:Create(itemContainer, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = DropdownOpened and UDim2.new(0, 175, 0, itemContainer.Size.Y.Offset + (DropdownY)) or UDim2.new(0, 175, 0, itemContainer.Size.Y.Offset - (DropdownY))}):Play()
-                    TweenService:Create(dropdown, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = DropdownOpened and UDim2.new(0, 175, 0, DropdownY + 28) or UDim2.new(0, 175, 0, 28)}):Play()
-                    TweenService:Create(dropdownFrame, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = DropdownOpened and UDim2.new(0, 171, 0, DropdownY + 24) or UDim2.new(0, 171, 0, 24)}):Play()
-                    TweenService:Create(dropdownContainer, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = DropdownOpened and UDim2.new(0, 171, 0, DropdownY) or UDim2.new(0, 171, 0, 0)}):Play()
-                    TweenService:Create(dropdownIcon, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Rotation = DropdownOpened and -90 or 90}):Play()
-                    dropdownIcon.Position = DropdownOpened and UDim2.new(0, 156, 0, 5) or UDim2.new(0, 155, 0, 5)
-                    if not DropdownOpened then
+                        TweenService:Create(section, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = UDim2.new(0, 175, 0, section.Size.Y.Offset + 24)}):Play()
+                        TweenService:Create(sectionFrame, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = UDim2.new(0, 175, 0, sectionFrame.Size.Y.Offset + 24)}):Play()
+                        TweenService:Create(itemContainer, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = UDim2.new(0, 175, 0, itemContainer.Size.Y.Offset + 24)}):Play()
+                        TweenService:Create(dropdown, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = UDim2.new(0, 175, 0, dropdown.Size.Y.Offset + 24)}):Play()
+                        TweenService:Create(dropdownFrame, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = UDim2.new(0, 171, 0, dropdownFrame.Size.Y.Offset + 24)}):Play()
+                        TweenService:Create(dropdownContainer, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = UDim2.new(0, 171, 0, dropdownContainer.Size.Y.Offset + 24)}):Play()
                         task.wait(0.1)
-                        containerHolder.ClipsDescendants = true
-                    end    
-                end)
+                    end
+
+                    local dropdownElement = Instance.new("Frame")
+                    dropdownElement.Name = "dropdownElement"
+                    dropdownElement.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    dropdownElement.BackgroundTransparency = 1
+                    dropdownElement.Size = UDim2.new(0, 171, 0, 24)
+                    dropdownElement.ZIndex = 2
+                    dropdownElement.Parent = dropdownContainer
+
+                    local dropdownElementText = Instance.new("TextLabel")
+                    dropdownElementText.Name = "dropdownElementText"
+                    dropdownElementText.Font = Enum.Font.GothamBold
+                    dropdownElementText.Text = str
+                    dropdownElementText.TextColor3 = Theme.ItemText
+                    dropdownElementText.TextSize = 12
+                    dropdownElementText.TextXAlignment = Enum.TextXAlignment.Left
+                    dropdownElementText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    dropdownElementText.BackgroundTransparency = 1
+                    dropdownElementText.Position = UDim2.new(0.0234, 0, 0, 0)
+                    dropdownElementText.Size = UDim2.new(0, 167, 0, 24)
+                    dropdownElementText.Parent = dropdownElement
+
+                    local dropdownElementButton = Instance.new("TextButton")
+                    dropdownElementButton.Name = "dropdownElementButton"
+                    dropdownElementButton.Font = Enum.Font.SourceSans
+                    dropdownElementButton.Text = ""
+                    dropdownElementButton.TextColor3 = Color3.fromRGB(0, 0, 0)
+                    dropdownElementButton.TextSize = 14
+                    dropdownElementButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    dropdownElementButton.BackgroundTransparency = 1
+                    dropdownElementButton.Size = UDim2.new(0, 171, 0, 24)
+                    dropdownElementButton.Parent = dropdownElement
+
+                    dropdownElement.MouseEnter:Connect(function()
+                        TweenService:Create(dropdownElementText, TweenInfo.new(0.125, EaseStyle, EaseDir), {TextColor3 = Theme.Highlight}):Play()
+                    end)
+
+                    dropdownElement.MouseLeave:Connect(function()
+                        TweenService:Create(dropdownElementText, TweenInfo.new(0.125, EaseStyle, EaseDir), {TextColor3 = Theme.ItemText}):Play()
+                    end)
+
+                    dropdownElementButton.MouseButton1Click:Connect(function()
+                        task.spawn(Info.Callback, dropdownElementText.Text)
+                        if Info.Flag then
+                            library.Flags[Info.Flag] = dropdownElementText.Text
+                        end
+                        if Info.ChangeTextOnPick then
+                            dropdownText.Text = dropdownElementText.Text
+                        end
+                        
+                        TweenService:Create(dropdownFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.ItemFrame}):Play()
+                        TweenService:Create(dropdownUIStroke, TweenInfo.new(0.1, EaseStyle, EaseDir), {Color = Theme.ItemUIStroke}):Play()
+
+                        DropdownOpened = false
+
+                        if DropdownOpened then
+                            containerHolder.ClipsDescendants = false
+                        end
+                        TweenService:Create(section, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = DropdownOpened and UDim2.new(0, 175, 0, section.Size.Y.Offset + (DropdownY)) or UDim2.new(0, 175, 0, section.Size.Y.Offset - (DropdownY))}):Play()
+                        TweenService:Create(sectionFrame, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = DropdownOpened and UDim2.new(0, 175, 0, sectionFrame.Size.Y.Offset + (DropdownY)) or UDim2.new(0, 175, 0, sectionFrame.Size.Y.Offset - (DropdownY))}):Play()
+                        TweenService:Create(itemContainer, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = DropdownOpened and UDim2.new(0, 175, 0, itemContainer.Size.Y.Offset + (DropdownY)) or UDim2.new(0, 175, 0, itemContainer.Size.Y.Offset - (DropdownY))}):Play()
+                        TweenService:Create(dropdown, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = DropdownOpened and UDim2.new(0, 175, 0, DropdownY + 28) or UDim2.new(0, 175, 0, 28)}):Play()
+                        TweenService:Create(dropdownFrame, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = DropdownOpened and UDim2.new(0, 171, 0, DropdownY + 24) or UDim2.new(0, 171, 0, 24)}):Play()
+                        TweenService:Create(dropdownContainer, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Size = DropdownOpened and UDim2.new(0, 171, 0, DropdownY) or UDim2.new(0, 171, 0, 0)}):Play()
+                        TweenService:Create(dropdownIcon, TweenInfo.new(0.1, EaseStyle, Enum.EasingDirection.Out), {Rotation = DropdownOpened and -90 or 90}):Play()
+                        dropdownIcon.Position = DropdownOpened and UDim2.new(0, 156, 0, 5) or UDim2.new(0, 155, 0, 5)
+                        if not DropdownOpened then
+                            task.wait(0.1)
+                            containerHolder.ClipsDescendants = true
+                        end    
+                    end)
                 end
 
                 function insidedropdown:Remove(opt)
@@ -1562,14 +1663,23 @@ function library:Window(Info)
                 toggleUIStroke.Name = "toggleUIStroke"
                 toggleUIStroke.Color = Theme.ItemUIStroke
                 toggleUIStroke.Parent = toggleFrame
-
+                
                 toggleFrame.MouseEnter:Connect(function()
                     TweenService:Create(toggleFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.HoverItemFrame}):Play()
+                    
+                    if ( Info.Tooltip ) then
+                        tooltip.Visible = true 
+                        tooltipText.Text = Info.Tooltip 
+                    end
                 end)
 
                 toggleFrame.MouseLeave:Connect(function()
                     TweenService:Create(toggleFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.ItemFrame}):Play()
                     TweenService:Create(toggleUIStroke, TweenInfo.new(0.1, EaseStyle, EaseDir), {Color = Theme.ItemUIStroke}):Play()
+                    
+                    if ( Info.Tooltip and tooltipText.Text == Info.Tooltip ) then
+                        tooltip.Visible = false
+                    end
                 end)
 
                 toggleTextButton.MouseButton1Down:Connect(function()
@@ -1663,13 +1773,23 @@ function library:Window(Info)
                 buttonUIStroke.Color = Theme.ItemUIStroke
                 buttonUIStroke.Parent = buttonFrame
 
+                
                 buttonFrame.MouseEnter:Connect(function()
                     TweenService:Create(buttonFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.HoverItemFrame}):Play()
+                    
+                    if ( Info.Tooltip ) then
+                        tooltip.Visible = true 
+                        tooltipText.Text = Info.Tooltip 
+                    end
                 end)
 
                 buttonFrame.MouseLeave:Connect(function()
                     TweenService:Create(buttonFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.ItemFrame}):Play()
                     TweenService:Create(buttonUIStroke, TweenInfo.new(0.1, EaseStyle, EaseDir), {Color = Theme.ItemUIStroke}):Play()
+                    
+                    if ( Info.Tooltip and tooltipText.Text == Info.Tooltip ) then
+                        tooltip.Visible = false
+                    end
                 end)
 
                 local buttonText = Instance.new("TextLabel")
