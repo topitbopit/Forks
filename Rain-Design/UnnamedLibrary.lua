@@ -9,6 +9,7 @@
 -- * Added toggle.State, self explanatory
 -- * Added section:Label
 -- * Added support for tooltips. Just set .Tooltip on whatever instance you're creating
+-- * (sparkly-byte) Added richtext support (😱)
 
 local library = {
     Flags = {},
@@ -235,6 +236,7 @@ function library:Notification(Info)
     notificationMainUICorner.Parent = notificationMain
 
     local notificationName = Instance.new("TextLabel")
+    notificationName.RichText = true
     notificationName.Name = "NotificationName"
     notificationName.Font = Enum.Font.GothamBold
     notificationName.Text = Info.Title
@@ -281,6 +283,7 @@ function library:Notification(Info)
     notificationCloseButton.Parent = topbar
 
     local notificationTime = Instance.new("TextLabel")
+    notificationTime.RichText = true
     notificationTime.Name = "NotificationTime"
     notificationTime.Font = Enum.Font.GothamBold
     notificationTime.Text = "36"
@@ -304,6 +307,7 @@ function library:Notification(Info)
     textFrame.Parent = notificationMain
 
     local notificationDescription = Instance.new("TextLabel")
+    notificationDescription.RichText = true
     notificationDescription.Name = "NotificationDescription"
     notificationDescription.Font = Enum.Font.GothamBold
     notificationDescription.Text = Info.Description
@@ -395,6 +399,7 @@ function library:Window(Info)
         newuIStroke.Parent = tooltip
     end
     local tooltipText = Instance.new("TextLabel")
+    tooltipText.RichText = true
     tooltipText.Name = "TooltipText"
     tooltipText.Font = Enum.Font.GothamBold
     tooltipText.Text = ''
@@ -515,6 +520,7 @@ function library:Window(Info)
     topbarLine.Parent = topbar
 
     local windowName = Instance.new("TextLabel")
+    windowName.RichText = true
     windowName.Name = "WindowName"
     windowName.Font = Enum.Font.GothamBold
     windowName.Text = Info.Text
@@ -686,6 +692,7 @@ function library:Window(Info)
         tabuIStroke.Parent = tabFrame
 
         local tabButton = Instance.new("TextButton")
+        tabButton.RichText = true
         tabButton.Name = "TabButton"
         tabButton.Font = Enum.Font.SourceSans
         tabButton.Text = ""
@@ -697,6 +704,7 @@ function library:Window(Info)
         tabButton.Parent = tabFrame
 
         local tabName = Instance.new("TextLabel")
+        tabName.RichText = true
         tabName.Name = "TabName"
         tabName.Font = Enum.Font.GothamBold
         tabName.Text = Info.Text
@@ -828,6 +836,7 @@ function library:Window(Info)
             sectionUICorner.Parent = sectionFrame
 
             local sectionName = Instance.new("TextLabel")
+            sectionName.RichText = true
             sectionName.Name = "SectionName"
             sectionName.Font = Enum.Font.GothamBold
             sectionName.Text = Info.Text
@@ -842,6 +851,7 @@ function library:Window(Info)
             sectionName.ZIndex = Sections + 2
 
             local sectionButton = Instance.new("TextButton")
+            sectionButton.RichText = true
             sectionButton.Name = "SectionButton"
             sectionButton.Font = Enum.Font.GothamBold
             sectionButton.Text = ""
@@ -967,6 +977,7 @@ function library:Window(Info)
                 keybindFrame.Parent = keybind
 
                 local keybindText = Instance.new("TextLabel")
+                keybindText.RichText = true
                 keybindText.Name = "KeybindText"
                 keybindText.Font = Enum.Font.GothamBold
                 keybindText.Text = Info.Text
@@ -980,6 +991,7 @@ function library:Window(Info)
                 keybindText.Parent = keybindFrame
 
                 local keybindTextButton = Instance.new("TextButton")
+                keybindTextButton.RichText = true
                 keybindTextButton.Name = "keybindTextButton"
                 keybindTextButton.Font = Enum.Font.SourceSans
                 keybindTextButton.Text = ""
@@ -1014,6 +1026,7 @@ function library:Window(Info)
                 keybindUICorner.Parent = keybindOuter
 
                 local keybindOuterText = Instance.new("TextLabel")
+                keybindOuterText.RichText = true
                 keybindOuterText.Name = "KeybindOuterText"
                 keybindOuterText.Font = Enum.Font.GothamBold
                 keybindOuterText.Text = PressKey.Name
@@ -1112,6 +1125,7 @@ function library:Window(Info)
                 sliderFrame.Parent = slider
 
                 local sliderText = Instance.new("TextLabel")
+                sliderText.RichText = true
                 sliderText.Name = "sliderText"
                 sliderText.Font = Enum.Font.GothamBold
                 sliderText.Text = Info.Text
@@ -1130,6 +1144,7 @@ function library:Window(Info)
                 sliderUIStroke.Parent = sliderFrame
 
                 local sliderValueText = Instance.new("TextLabel")
+                sliderValueText.RichText = true
                 sliderValueText.Name = "sliderValueText"
                 sliderValueText.Font = Enum.Font.GothamBold
                 sliderValueText.Text = tostring(Info.Default)..Info.Postfix
@@ -1188,6 +1203,7 @@ function library:Window(Info)
                 dragButton.BackgroundTransparency = 1
                 dragButton.Size = UDim2.new(0, 9, 0, 9)
                 dragButton.Parent = dragIcon
+                dragButton.RichText = true
                 
                 sliderFrame.MouseEnter:Connect(function()
                     TweenService:Create(sliderFrame, TweenInfo.new(0.1, EaseStyle, EaseDir), {BackgroundColor3 = Theme.HoverItemFrame}):Play()
@@ -1349,6 +1365,7 @@ function library:Window(Info)
                 dropdownFrame.Parent = dropdown
 
                 local dropdownText = Instance.new("TextLabel")
+                dropdownText.RichText = true
                 dropdownText.Name = "dropdownText"
                 dropdownText.Font = Enum.Font.GothamBold
                 dropdownText.Text = Info.Text
@@ -1371,6 +1388,7 @@ function library:Window(Info)
                 dropdownTextButton.BackgroundTransparency = 1
                 dropdownTextButton.Size = UDim2.new(0, 171, 0, 24)
                 dropdownTextButton.Parent = dropdownFrame
+                dropdownTextButton.RichText = true
 
                 local dropdownUIStroke = Instance.new("UIStroke")
                 dropdownUIStroke.Name = "dropdownUIStroke"
@@ -1467,6 +1485,7 @@ function library:Window(Info)
                     dropdownElement.Parent = dropdownContainer
 
                     local dropdownElementText = Instance.new("TextLabel")
+                    dropdownElementText.RichText = true
                     dropdownElementText.Name = "dropdownElementText"
                     dropdownElementText.Font = Enum.Font.GothamBold
                     dropdownElementText.Text = str
@@ -1489,6 +1508,7 @@ function library:Window(Info)
                     dropdownElementButton.BackgroundTransparency = 1
                     dropdownElementButton.Size = UDim2.new(0, 171, 0, 24)
                     dropdownElementButton.Parent = dropdownElement
+                    dropdownElementButton.RichText = true
 
                     dropdownElement.MouseEnter:Connect(function()
                         TweenService:Create(dropdownElementText, TweenInfo.new(0.125, EaseStyle, EaseDir), {TextColor3 = Theme.Highlight}):Play()
@@ -1637,6 +1657,7 @@ function library:Window(Info)
 
                 local toggleText = Instance.new("TextLabel")
                 toggleText.Name = "toggleText"
+                toggleText.RichText = true
                 toggleText.Font = Enum.Font.GothamBold
                 toggleText.Text = Info.Text
                 toggleText.TextColor3 = Theme.ItemText
@@ -1658,6 +1679,7 @@ function library:Window(Info)
                 toggleTextButton.BackgroundTransparency = 1
                 toggleTextButton.Size = UDim2.new(0, 171, 0, 24)
                 toggleTextButton.Parent = toggleFrame
+                toggleTextButton.RichText = true
 
                 local toggleUIStroke = Instance.new("UIStroke")
                 toggleUIStroke.Name = "toggleUIStroke"
@@ -1793,6 +1815,7 @@ function library:Window(Info)
                 end)
 
                 local buttonText = Instance.new("TextLabel")
+                buttonText.RichText = true
                 buttonText.Name = "ButtonText"
                 buttonText.Font = Enum.Font.GothamBold
                 buttonText.Text = Info.Text
@@ -1813,6 +1836,7 @@ function library:Window(Info)
                 buttonTextButton.BackgroundTransparency = 1
                 buttonTextButton.Size = UDim2.new(0, 171, 0, 24)
                 buttonTextButton.Parent = buttonFrame
+                buttonTextButton.RichText = true
 
                 buttonTextButton.MouseButton1Down:Connect(function()
                     TweenService:Create(buttonUIStroke, TweenInfo.new(0.1, EaseStyle, EaseDir), {Color = Theme.ItemUIStrokeSelected}):Play()
@@ -1853,6 +1877,7 @@ function library:Window(Info)
                 labelUIStroke.Parent = labelFrame
 
                 local labelText = Instance.new("TextLabel")
+                labelText.RichText = true
                 labelText.Name = "LabelText"
                 labelText.Font = Enum.Font.GothamBold
                 labelText.Text = Info.Text
