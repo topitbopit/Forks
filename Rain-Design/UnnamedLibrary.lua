@@ -10,6 +10,7 @@
 -- * Added section:Label
 -- * Added support for tooltips. Just set .Tooltip on whatever instance you're creating
 -- * (sparkly-byte) Added richtext support (😱)
+-- * Added Label:SetText(NewText)
 
 local library = {
     Flags = {},
@@ -1890,6 +1891,12 @@ function library:Window(Info)
                 labelText.TextXAlignment = 'Left'
                 labelText.TextWrapped = true 
                 labelText.Parent = labelFrame
+                
+                local labeltable = {} 
+                function labeltable:SetText(new) 
+                    labelText.Text = new 
+                end
+                return labeltable
             end
 
             return sectiontable
