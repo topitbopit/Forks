@@ -11,6 +11,9 @@
 -- * Added support for tooltips. Just set .Tooltip on whatever instance you're creating
 -- * (sparkly-byte) Added richtext support (😱)
 -- * Added Label:SetText(NewText)
+-- 10/25/2022
+-- * Added Toggle:Toggle()
+-- * Added Button:Click()
 
 local library = {
     Flags = {},
@@ -1754,6 +1757,15 @@ function library:Window(Info)
                     TweenService:Create(toggleOuterUIStroke, TweenInfo.new(0.125, EaseStyle, EaseDir), {Color = bool and Theme.ToggleOuterUIStrokeEnabled or Theme.ToggleOuterUIStroke}):Play()
                     
                     task.spawn(Info.Callback, bool)
+                    
+                    return toggletable
+                end
+                
+                function toggletable:Toggle() 
+                    Enabled = not Enabled
+                    toggletable:Set(Enabled)
+                    
+                    return toggletable 
                 end
 
                 if Info.Default then
@@ -1850,6 +1862,14 @@ function library:Window(Info)
                 buttonTextButton.MouseButton1Click:Connect(function()
                     task.spawn(Info.Callback)
                 end)
+                
+                local buttontable = {}
+                
+                function buttontable:Click() 
+                    return task.spawn(Info.Callback)
+                end
+                
+                return buttontable
             end
 
             function sectiontable:Label(Info)
