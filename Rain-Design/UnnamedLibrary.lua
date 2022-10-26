@@ -15,6 +15,8 @@
 -- * Added Toggle:Toggle()
 -- * Added Button:Click()
 -- * Fixed Keybinds erroring on creation
+-- * Added Keybind.Unbindable
+-- * Fixed keybinds not being cleaned up on UI destruction 
 
 local library = {
     Flags = {},
@@ -138,12 +140,13 @@ local RunService = game:GetService("RunService")
 
 local Mouse = game:GetService('Players').LocalPlayer:GetMouse()
 
-local Blacklist = {Enum.KeyCode.Unknown, Enum.KeyCode.CapsLock, Enum.KeyCode.Escape, Enum.KeyCode.Tab, Enum.KeyCode.Return, Enum.KeyCode.Backspace, Enum.KeyCode.Space, Enum.KeyCode.W, Enum.KeyCode.A, Enum.KeyCode.S, Enum.KeyCode.D}
+local Blacklist = {Enum.KeyCode.Unknown, Enum.KeyCode.CapsLock, Enum.KeyCode.Escape, Enum.KeyCode.Tab, Enum.KeyCode.Return, Enum.KeyCode.Backspace}
 
 local EaseStyle = Enum.EasingStyle.Linear
 local EaseDir = Enum.EasingDirection.InOut
 
 local BlankFn = function() end 
+local KeybindConns = {} 
 
 local request = syn and syn.request or http and http.request or http_request or request or httprequest
 local getcustomasset = getcustomasset or getsynasset
@@ -559,7 +562,11 @@ function library:Window(Info)
 
     closeButton.MouseButton1Click:Connect(function()
         if ( library.KillCallback ) then
-            library.KillCallback() -- not spawned for synchronicity 
+            library.KillCallback() -- not spawned intentionally (for synchronicity)
+        end
+        
+        for i, v in ipairs(KeybindConns) do 
+            v:Disconnect() 
         end
         
         tooltipCn:Disconnect()
@@ -960,9 +967,10 @@ function library:Window(Info)
 
             function sectiontable:Keybind(Info)
                 Info.Text = Info.Text or "Keybind"
-                Info.Default = Info.Default or Enum.KeyCode.LeftAlt
+                Info.Default = Info.Default or nil
                 Info.Callback = Info.Callback or BlankFn
-
+                Info.Unbindable = (Info.Unbindable == true) or false
+                 
                 local PressKey = Info.Default
 
                 local keybind = Instance.new("Frame")
@@ -1034,7 +1042,7 @@ function library:Window(Info)
                 keybindOuterText.RichText = true
                 keybindOuterText.Name = "KeybindOuterText"
                 keybindOuterText.Font = Enum.Font.GothamBold
-                keybindOuterText.Text = PressKey.Name
+                keybindOuterText.Text = PressKey and PressKey.Name or 'None'
                 keybindOuterText.TextColor3 = Color3.fromRGB(232, 232, 232)
                 keybindOuterText.TextSize = 12
                 keybindOuterText.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -1077,23 +1085,39 @@ function library:Window(Info)
                     Changing = true
                     keybindOuterText.Text = "..."
                     keybindOuterUIStroke.Color = Theme.ItemUIStrokeSelected
+                    
                     KeybindConnection = UserInputService.InputBegan:Connect(function(Key, gameProcessed)
-                        if not table.find(Blacklist, Key.KeyCode) and not gameProcessed then
+                        if ( gameProcessed ) then 
+                            return
+                        end
+                        
+                        local found = table.find(Blacklist, Key.KeyCode)  
+                        if ( not found ) then
                             KeybindConnection:Disconnect()
                             keybindOuterText.Text = Key.KeyCode.Name
                             keybindOuterUIStroke.Color = Theme.ToggleOuterUIStroke
                             PressKey = Key.KeyCode
                             task.wait(0.1)
                             Changing = false
+                            
+                        elseif ( Info.Unbindable ) then
+                            KeybindConnection:Disconnect()
+                            keybindOuterText.Text = 'None'
+                            keybindOuterUIStroke.Color = Theme.ToggleOuterUIStroke
+                            PressKey = nil
+                            task.wait(0.1)
+                            Changing = false
                         end
                     end)
                 end)
 
-                UserInputService.InputBegan:Connect(function(Key, gameProcessed)
+                local cn = UserInputService.InputBegan:Connect(function(Key, gameProcessed)
                     if not Changing and Key.KeyCode == PressKey and not gameProcessed then
                         task.spawn(Info.Callback)
                     end
                 end)
+                
+                table.insert(KeybindConns, cn)
             end
 
             function sectiontable:Slider(Info)
@@ -1556,7 +1580,7 @@ function library:Window(Info)
                 end
 
                 function insidedropdown:Remove(opt)
-                    for _,v in pairs(dropdownContainer:GetChildren()) do
+                    for _,v in ipairs(dropdownContainer:GetChildren()) do
                         if v.ClassName == "Frame" and v.dropdownElementText.Text == opt then
                             DropdownY = DropdownY - 24
                             if DropdownOpened then
@@ -1574,7 +1598,7 @@ function library:Window(Info)
                 end
 
                 function insidedropdown:Clear()
-                    for _,v in pairs(dropdownContainer:GetChildren()) do
+                    for _,v in ipairs(dropdownContainer:GetChildren()) do
                         if v.ClassName == "Frame" then
                             insidedropdown:Remove(v.dropdownElementText.Text)
                         end
