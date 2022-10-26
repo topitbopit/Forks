@@ -14,6 +14,7 @@
 -- 10/25/2022
 -- * Added Toggle:Toggle()
 -- * Added Button:Click()
+-- * Fixed Keybinds erroring on creation
 
 local library = {
     Flags = {},
@@ -959,7 +960,7 @@ function library:Window(Info)
 
             function sectiontable:Keybind(Info)
                 Info.Text = Info.Text or "Keybind"
-                Info.Default = Info.Default or Enum.KeyCode.Alt
+                Info.Default = Info.Default or Enum.KeyCode.LeftAlt
                 Info.Callback = Info.Callback or BlankFn
 
                 local PressKey = Info.Default
